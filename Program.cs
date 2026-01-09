@@ -60,6 +60,7 @@ class Program
                 return false;
             }
             using var fileStream = new FileStream(path, FileMode.Open);
+            _fileMemory.SetLength(0);
             _fileMemory.Seek(0, SeekOrigin.Begin);
             fileStream.CopyTo(_fileMemory);
             
@@ -134,7 +135,16 @@ class Program
             Console.WriteLine("Invalid command. Usage: add <item ID>");
             return;
         }
-        ushort itemId = ushort.Parse(commandParts[1]);
+        if (_currentInventory.Count >= 30)
+        {
+            Console.WriteLine("Inventory is full.");
+            return;
+        }
+        if (!ushort.TryParse(commandParts[1], out ushort itemId))
+        {
+            Console.WriteLine("Invalid command. Usage: add <item ID>");
+            return;
+        }
         if (!_curItems.ContainsKey(itemId))
         {
             Console.WriteLine("Invalid item ID.");
@@ -156,7 +166,11 @@ class Program
             Console.WriteLine("Invalid command. Usage: remove <item ID>");
             return;
         }
-        ushort itemId = ushort.Parse(commandParts[1]);
+        if (!ushort.TryParse(commandParts[1], out ushort itemId))
+        {
+            Console.WriteLine("Invalid command. Usage: remove <item ID>");
+            return;
+        }
         if (!_currentInventory.Contains(itemId))
         {
             Console.WriteLine("Item is not in inventory.");
